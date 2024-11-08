@@ -25,17 +25,18 @@ public class GameController {
             for (int col = 0; col < board.getSIZE(); col++) {
                 Tile tile = board.getTile(row, col);
                 TileView tileView = boardView.getTileView(row, col);
-                tileView.getStackPane().setOnMouseClicked(event -> handleTileClick(tile, tileView));
+                tileView.getStackPane().setOnMouseClicked(event -> handleTileClick(tile));
             }
         }
     }
 
-    private void handleTileClick(Tile clickedTile, TileView clickedTileView) {
+    private void handleTileClick(Tile clickedTile) {
         if (clickedTile.getPiece() != null && isPieceColorCorrect(clickedTile.getPiece())) {
             selectedTile = clickedTile;
         } else if (selectedTile != null && board.getGameLogic().isValidMove(selectedTile, clickedTile)) {
             movePiece(selectedTile, clickedTile);
-            updateViewAfterMove(selectedTile, clickedTileView);
+            board.getGameLogic().checkPromotion(clickedTile);
+            updateViewAfterMove(selectedTile, clickedTile);
             endTurn();
         }
     }
@@ -49,10 +50,15 @@ public class GameController {
         fromTile.setPiece(null);
     }
 
-    private void updateViewAfterMove(Tile fromTile, TileView toTileView) {
+    private void updateViewAfterMove(Tile fromTile, Tile toTile) {
         TileView fromTileView = boardView.getTileView(fromTile.getRow(), fromTile.getCol());
+        TileView toTileView = boardView.getTileView(toTile.getRow(), toTile.getCol());
 
         PieceView pieceView = fromTileView.getPieceView();
+        if(toTile.getPiece().isKing()) {
+            pieceView.promoteToKing();
+        }
+        
         toTileView.setPieceView(pieceView);
         fromTileView.removePieceView();
     }
