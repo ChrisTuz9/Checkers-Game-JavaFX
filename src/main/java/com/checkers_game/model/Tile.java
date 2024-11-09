@@ -20,10 +20,6 @@ public class Tile {
         piece = new Piece(pieceColor);
     }
 
-    public void clearPiece() {
-        piece = null;
-    }
-
     public boolean isEmpty() {
         return piece == null;
     }

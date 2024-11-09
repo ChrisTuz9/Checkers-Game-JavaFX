@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class Board {
-    private final int SIZE = 8;
+    private final  int SIZE = 8;
     private Tile[][] tiles = new Tile[SIZE][SIZE];
     private PieceColor playerColor;
     private PieceColor opponentColor;
@@ -38,4 +38,7 @@ public class Board {
         return tiles[row][col];
     }
 
+    public boolean inBoardRange(int row, int col) {
+        return row >= 0 && row < SIZE && col >= 0 && col < SIZE;
+    }
 }

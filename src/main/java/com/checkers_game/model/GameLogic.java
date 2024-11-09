@@ -22,6 +22,11 @@ public class GameLogic {
         if(rowDiff != colDiff)
             return false;
 
+        if(tilesWithPieces.size() == 1) {
+            if (tilesWithPieces.getFirst().getPiece().getColor() == from.getPiece().getColor())
+                return false;
+        }
+
         if(from.getPiece().isKing())
             return true;
 
@@ -53,13 +58,71 @@ public class GameLogic {
 
     public void checkPromotion(Tile toTile) {
         Piece piece = toTile.getPiece();
-        if (piece != null) {
+        if(piece != null) {
             int row = toTile.getRow();
             PieceColor pieceColor = piece.getColor();
-            if ((pieceColor == board.getPlayerColor() && row == 0) ||
+            if((pieceColor == board.getPlayerColor() && row == 0) ||
                     (pieceColor == board.getOpponentColor() && row == board.getSIZE() - 1)) {
                 piece.promoteToKing();
             }
         }
+    }
+
+    public boolean isCapturePossibleForColor(PieceColor color) {
+        for(int row = 0; row < board.getSIZE(); row++) {
+            for(int col = 0; col < board.getSIZE(); col++) {
+                Tile tile = board.getTile(row, col);
+                Piece piece = tile.getPiece();
+                if(piece != null && piece.getColor() == color) {
+                    if(canPieceCapture(tile))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean canPieceCapture(Tile tile) {
+        int row = tile.getRow();
+        int col = tile.getCol();
+        int[] deltaX = {-2, 2, -2, 2};
+        int[] deltaY = {2, 2, -2, -2};
+
+        if(tile.getPiece().isKing()) {
+            for(int i = 0; i < 4; i++) {
+                for(int checkRow = row + deltaX[i], checkCol = col + deltaY[i]; board.inBoardRange(checkRow, checkCol); checkRow += deltaX[i], checkCol += deltaY[i]) {
+                    if(canCaptureInDirection(tile, board.getTile(checkRow, checkCol)))
+                        return true;
+                }
+            }
+        } else {
+            for(int i = 0; i < 4; i++) {
+                int checkRow = row + deltaX[i];
+                int checkCol = col + deltaY[i];
+                if(!board.inBoardRange(checkRow, checkCol))
+                    continue;
+                if(canCaptureInDirection(tile, board.getTile(checkRow, checkCol)))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean canCaptureInDirection(Tile from, Tile to) {
+        if(to.getPiece() != null)
+            return false;
+
+        List<Tile> tilesWithPieces = getTilesWithPiece(from, to);
+
+        if(tilesWithPieces.size() != 1)
+            return false;
+
+        if(tilesWithPieces.getFirst().getPiece().getColor() == from.getPiece().getColor())
+            return false;
+
+        if(from.getPiece().isKing())
+            return true;
+
+        return Math.abs(from.getRow() - to.getRow()) == 2;
     }
 }
