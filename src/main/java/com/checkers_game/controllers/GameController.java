@@ -47,7 +47,11 @@ public class GameController {
                     tileWithPieceToCapture.setPiece(null);
                     boardView.getTileView(tileWithPieceToCapture.getRow(), tileWithPieceToCapture.getCol()).removePieceView();
                     movePiece(selectedTile, clickedTile);
-                    endTurn();
+                    if(gameLogic.canPieceCapture(clickedTile)) {
+                        selectedTile = clickedTile;
+                    } else {
+                        endTurn();
+                    }
                 }
                 else if(!gameLogic.isCapturePossibleForColor(isWhiteTurn ? PieceColor.WHITE : PieceColor.BLACK)) {
                     movePiece(selectedTile, clickedTile);

@@ -82,7 +82,7 @@ public class GameLogic {
         return false;
     }
 
-    private boolean canPieceCapture(Tile tile) {
+    public boolean canPieceCapture(Tile tile) {
         int row = tile.getRow();
         int col = tile.getCol();
         int[] deltaX = {-2, 2, -2, 2};
