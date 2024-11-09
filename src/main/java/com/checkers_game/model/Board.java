@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 public class Board {
     private final int SIZE = 8;
-    private final GameLogic gameLogic;
     private Tile[][] tiles = new Tile[SIZE][SIZE];
     private PieceColor playerColor;
     private PieceColor opponentColor;
@@ -21,7 +20,6 @@ public class Board {
             }
         }
 
-        this.gameLogic = new GameLogic(this);
         placePieces(0, 3, opponentColor);
         placePieces(SIZE - 3, SIZE, playerColor);
     }

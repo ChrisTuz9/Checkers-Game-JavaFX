@@ -1,6 +1,7 @@
 package com.checkers_game.controllers;
 
 import com.checkers_game.model.Board;
+import com.checkers_game.model.GameLogic;
 import com.checkers_game.model.Piece;
 import com.checkers_game.model.Tile;
 import com.checkers_game.model.enums.PieceColor;
@@ -11,12 +12,14 @@ import com.checkers_game.view.TileView;
 public class GameController {
     private final Board board;
     private final BoardView boardView;
+    private final GameLogic gameLogic;
     private boolean isWhiteTurn = true;
     private Tile selectedTile = null;
 
     public GameController(Board board, BoardView boardView) {
         this.board = board;
         this.boardView = boardView;
+        this.gameLogic = new GameLogic(board);
         setupInteractions();
     }
 
@@ -33,11 +36,18 @@ public class GameController {
     private void handleTileClick(Tile clickedTile) {
         if (clickedTile.getPiece() != null && isPieceColorCorrect(clickedTile.getPiece())) {
             selectedTile = clickedTile;
-        } else if (selectedTile != null && board.getGameLogic().isValidMove(selectedTile, clickedTile)) {
-            movePiece(selectedTile, clickedTile);
-            board.getGameLogic().checkPromotion(clickedTile);
-            updateViewAfterMove(selectedTile, clickedTile);
-            endTurn();
+        } else if (selectedTile != null) {
+            Tile tileWithPieceToCapture = gameLogic.getTileWithPieceToCapture(selectedTile, clickedTile);
+            System.out.println(tileWithPieceToCapture);
+            if (gameLogic.isValidMove(selectedTile, clickedTile, tileWithPieceToCapture))
+            {
+                if(tileWithPieceToCapture != null) {
+                    tileWithPieceToCapture.setPiece(null);
+                    boardView.getTileView(tileWithPieceToCapture.getRow(), tileWithPieceToCapture.getCol()).removePieceView();
+                }
+                movePiece(selectedTile, clickedTile);
+                endTurn();
+            }
         }
     }
 
@@ -48,6 +58,8 @@ public class GameController {
     private void movePiece(Tile fromTile, Tile toTile) {
         toTile.setPiece(fromTile.getPiece());
         fromTile.setPiece(null);
+        gameLogic.checkPromotion(toTile);
+        updateViewAfterMove(fromTile, toTile);
     }
 
     private void updateViewAfterMove(Tile fromTile, Tile toTile) {
@@ -58,7 +70,7 @@ public class GameController {
         if(toTile.getPiece().isKing()) {
             pieceView.promoteToKing();
         }
-        
+
         toTileView.setPieceView(pieceView);
         fromTileView.removePieceView();
     }
