@@ -9,6 +9,8 @@ import com.checkers_game.view.BoardView;
 import com.checkers_game.view.PieceView;
 import com.checkers_game.view.TileView;
 
+import java.util.List;
+
 public class GameController {
     private final Board board;
     private final BoardView boardView;
@@ -37,11 +39,11 @@ public class GameController {
         if (clickedTile.getPiece() != null && isPieceColorCorrect(clickedTile.getPiece())) {
             selectedTile = clickedTile;
         } else if (selectedTile != null) {
-            Tile tileWithPieceToCapture = gameLogic.getTileWithPieceToCapture(selectedTile, clickedTile);
-            System.out.println(tileWithPieceToCapture);
-            if (gameLogic.isValidMove(selectedTile, clickedTile, tileWithPieceToCapture))
+            List<Tile> tilesWithPiece = gameLogic.getTilesWithPiece(selectedTile, clickedTile);
+            if (gameLogic.isValidMove(selectedTile, clickedTile, tilesWithPiece))
             {
-                if(tileWithPieceToCapture != null) {
+                if(tilesWithPiece.size() == 1) {
+                    Tile tileWithPieceToCapture = tilesWithPiece.getFirst();
                     tileWithPieceToCapture.setPiece(null);
                     boardView.getTileView(tileWithPieceToCapture.getRow(), tileWithPieceToCapture.getCol()).removePieceView();
                 }
