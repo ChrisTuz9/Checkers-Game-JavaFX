@@ -4,6 +4,8 @@ import com.checkers_game.model.enums.PieceColor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class GameLogic {
     private final Board board;
@@ -72,13 +74,13 @@ public class GameLogic {
         }
     }
 
-    public boolean isCapturePossibleForColor(PieceColor color) {
+    public boolean checkAllTiles(PieceColor color, Predicate<Tile> function) {
         for(int row = 0; row < board.getSIZE(); row++) {
             for(int col = 0; col < board.getSIZE(); col++) {
                 Tile tile = board.getTile(row, col);
                 Piece piece = tile.getPiece();
                 if(piece != null && piece.getColor() == color) {
-                    if(canCapturePiece(tile))
+                    if(function.test(tile))
                         return true;
                 }
             }
@@ -86,23 +88,58 @@ public class GameLogic {
         return false;
     }
 
-    public boolean canCapturePiece(Tile tile) {
+    public boolean isMovePossibleForColor(PieceColor color) {
+        return checkAllTiles(color, this::canMove);
+    }
+
+    public boolean canMove(Tile tile) {
+        Piece piece = tile.getPiece();
         int row = tile.getRow();
         int col = tile.getCol();
-        int[] deltaX = {-2, 2, -2, 2};
-        int[] deltaY = {2, 2, -2, -2};
+        int[] deltaX = { -1, 1 };
+        int[] deltaY;
+        if (piece.isKing()) {
+            deltaY = new int[] { 1, -1 };
+        } else {
+            deltaY = new int[] { piece.getColor() == board.getPlayerColor() ? 1 : -1 };
+        }
+
+        for(int i = 0; i < deltaX.length; i++) {
+            for(int j = 0; j < deltaY.length; j++) {
+                int checkRow = row + deltaX[i];
+                int checkCol = col + deltaY[j];
+                if(board.inBoardRange(checkRow, checkCol)) {
+                    if(board.getTile(checkRow, checkCol).isEmpty()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean isCapturePossibleForColor(PieceColor color) {
+        return checkAllTiles(color, this::canCapture);
+    }
+
+    public boolean canCapture(Tile tile) {
+        int row = tile.getRow();
+        int col = tile.getCol();
+        int[] deltaX = {-1, 1, -1, 1};
+        int[] deltaY = {1, 1, -1, -1};
 
         if(tile.getPiece().isKing()) {
             for(int i = 0; i < 4; i++) {
-                for(int checkRow = row + deltaX[i], checkCol = col + deltaY[i]; board.inBoardRange(checkRow, checkCol); checkRow += deltaX[i], checkCol += deltaY[i]) {
+                for(int checkRow = row + 2 * deltaX[i], checkCol = col + 2 * deltaY[i]; board.inBoardRange(checkRow, checkCol); checkRow += deltaX[i], checkCol += deltaY[i]) {
                     if(canCaptureInDirection(tile, board.getTile(checkRow, checkCol)))
                         return true;
                 }
             }
         } else {
             for(int i = 0; i < 4; i++) {
-                int checkRow = row + deltaX[i];
-                int checkCol = col + deltaY[i];
+                int checkRow = row + 2 * deltaX[i];
+                int checkCol = col + 2 * deltaY[i];
                 if(!board.inBoardRange(checkRow, checkCol))
                     continue;
                 if(canCaptureInDirection(tile, board.getTile(checkRow, checkCol)))
@@ -128,5 +165,9 @@ public class GameLogic {
             return true;
 
         return Math.abs(from.getRow() - to.getRow()) == 2;
+    }
+
+    public boolean hasAnyValidMove(PieceColor color) {
+        return isMovePossibleForColor(color) || isCapturePossibleForColor(color);
     }
 }

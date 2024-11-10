@@ -47,7 +47,7 @@ public class GameController {
                     tileWithPieceToCapture.setPiece(null);
                     boardView.getTileView(tileWithPieceToCapture.getRow(), tileWithPieceToCapture.getCol()).removePieceView();
                     movePiece(selectedTile, clickedTile);
-                    if(gameLogic.canCapturePiece(clickedTile)) {
+                    if(gameLogic.canCapture(clickedTile)) {
                         selectedTile = clickedTile;
                     } else {
                         endTurn();
@@ -88,5 +88,18 @@ public class GameController {
     private void endTurn() {
         isWhiteTurn = !isWhiteTurn;
         selectedTile = null;
+        checkGameOver();
+    }
+
+    private void checkGameOver() {
+        if(isWhiteTurn) {
+            if (!gameLogic.hasAnyValidMove(PieceColor.WHITE)) {
+                System.out.println("Black win");
+            }
+        } else {
+            if(!gameLogic.hasAnyValidMove(PieceColor.BLACK)) {
+                System.out.println("White win");
+            }
+        }
     }
 }
