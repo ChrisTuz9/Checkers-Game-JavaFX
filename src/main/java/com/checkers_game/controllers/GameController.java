@@ -116,5 +116,6 @@ public class GameController {
         alert.setContentText(message);
 
         alert.showAndWait();
+        System.exit(0);
     }
 }
