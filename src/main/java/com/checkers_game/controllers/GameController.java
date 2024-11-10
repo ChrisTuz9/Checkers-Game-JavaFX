@@ -47,7 +47,7 @@ public class GameController {
                     tileWithPieceToCapture.setPiece(null);
                     boardView.getTileView(tileWithPieceToCapture.getRow(), tileWithPieceToCapture.getCol()).removePieceView();
                     movePiece(selectedTile, clickedTile);
-                    if(gameLogic.canPieceCapture(clickedTile)) {
+                    if(gameLogic.canCapturePiece(clickedTile)) {
                         selectedTile = clickedTile;
                     } else {
                         endTurn();

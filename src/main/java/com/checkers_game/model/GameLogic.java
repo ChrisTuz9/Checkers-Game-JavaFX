@@ -16,14 +16,17 @@ public class GameLogic {
         if(to.getPiece() != null || tilesWithPieces.size() > 1)
             return false;
 
-        int rowDiff = Math.abs(from.getRow() - to.getRow());
+        int directionY = from.getRow() - to.getRow();
+        int rowDiff = Math.abs(directionY);
         int colDiff = Math.abs(from.getCol() - to.getCol());
 
         if(rowDiff != colDiff)
             return false;
 
+        PieceColor pieceColor = from.getPiece().getColor();
+
         if(tilesWithPieces.size() == 1) {
-            if (tilesWithPieces.getFirst().getPiece().getColor() == from.getPiece().getColor())
+            if (tilesWithPieces.getFirst().getPiece().getColor() == pieceColor)
                 return false;
         }
 
@@ -32,7 +35,8 @@ public class GameLogic {
 
         if(tilesWithPieces.size() == 1)
             return rowDiff == 2;
-        return rowDiff == 1;
+
+        return directionY == (pieceColor == board.getPlayerColor() ? 1 : -1);
     }
 
     public List<Tile> getTilesWithPiece(Tile from, Tile to) {
@@ -74,7 +78,7 @@ public class GameLogic {
                 Tile tile = board.getTile(row, col);
                 Piece piece = tile.getPiece();
                 if(piece != null && piece.getColor() == color) {
-                    if(canPieceCapture(tile))
+                    if(canCapturePiece(tile))
                         return true;
                 }
             }
@@ -82,7 +86,7 @@ public class GameLogic {
         return false;
     }
 
-    public boolean canPieceCapture(Tile tile) {
+    public boolean canCapturePiece(Tile tile) {
         int row = tile.getRow();
         int col = tile.getCol();
         int[] deltaX = {-2, 2, -2, 2};
