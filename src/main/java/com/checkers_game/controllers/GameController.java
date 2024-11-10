@@ -8,6 +8,7 @@ import com.checkers_game.model.enums.PieceColor;
 import com.checkers_game.view.BoardView;
 import com.checkers_game.view.PieceView;
 import com.checkers_game.view.TileView;
+import javafx.scene.control.Alert;
 
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class GameController {
     private final GameLogic gameLogic;
     private boolean isWhiteTurn = true;
     private Tile selectedTile = null;
+    private String gameOverMessage = null;
 
     public GameController(Board board, BoardView boardView) {
         this.board = board;
@@ -94,12 +96,25 @@ public class GameController {
     private void checkGameOver() {
         if(isWhiteTurn) {
             if (!gameLogic.hasAnyValidMove(PieceColor.WHITE)) {
-                System.out.println("Black win");
+                gameOverMessage = "Black win!";
             }
         } else {
             if(!gameLogic.hasAnyValidMove(PieceColor.BLACK)) {
-                System.out.println("White win");
+                gameOverMessage = "White win!";
             }
         }
+
+        if(gameOverMessage != null) {
+            showGameOverDialog(gameOverMessage);
+        }
+    }
+
+    private void showGameOverDialog(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Over");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
     }
 }

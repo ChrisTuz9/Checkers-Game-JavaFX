@@ -101,13 +101,13 @@ public class GameLogic {
         if (piece.isKing()) {
             deltaY = new int[] { 1, -1 };
         } else {
-            deltaY = new int[] { piece.getColor() == board.getPlayerColor() ? 1 : -1 };
+            deltaY = new int[] { piece.getColor() == board.getPlayerColor() ? -1 : 1 };
         }
 
         for(int i = 0; i < deltaX.length; i++) {
             for(int j = 0; j < deltaY.length; j++) {
-                int checkRow = row + deltaX[i];
-                int checkCol = col + deltaY[j];
+                int checkRow = row + deltaY[j];
+                int checkCol = col + deltaX[i];
                 if(board.inBoardRange(checkRow, checkCol)) {
                     if(board.getTile(checkRow, checkCol).isEmpty()) {
                         return true;
